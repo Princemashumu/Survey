@@ -1,24 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import Header from './components/Header';
+import SurveyForm from './components/SurveyForm';
+import SurveyResults from './components/SurveyResults';
 
 function App() {
+  const [view, setView] = useState('form'); // 'form' or 'results'
+  const [responses, setResponses] = useState([]);
+
+  const handleAddSurvey = (data) => {
+    setResponses(prev => [...prev, data]);
+    setView('results');
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Header setView={setView} currentView={view} />
+      {view === 'form' ? (
+        <SurveyForm onSubmit={handleAddSurvey} />
+      ) : (
+        <SurveyResults responses={responses} />
+      )}
+    </>
   );
 }
 
