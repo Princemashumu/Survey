@@ -7,7 +7,7 @@ import { db } from './firebase';
 import { addDoc, collection, getDocs } from 'firebase/firestore';
 
 function App() {
-  const [view, setView] = useState('form');
+  const [activeTab, setActiveTab] = useState('form'); // 'form' or 'results'
   const [responses, setResponses] = useState([]);
 
   const surveysCollection = useMemo(() => collection(db, 'surveys'), []);
@@ -16,7 +16,7 @@ function App() {
     try {
       await addDoc(surveysCollection, data);
       fetchResponses(); // Refresh list
-      setView('results');
+      setActiveTab('results');
     } catch (err) {
       console.error("Error adding survey:", err);
     }
@@ -38,8 +38,8 @@ function App() {
 
   return (
     <>
-      <Header setView={setView} />
-      {view === 'form' ? (
+      <Header currentView={activeTab} setView={setActiveTab} />
+      {activeTab === 'form' ? (
         <SurveyForm onSubmit={handleAddSurvey} />
       ) : (
         <SurveyResults responses={responses} />

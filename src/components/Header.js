@@ -1,17 +1,32 @@
-import React from 'react';
-import { AppBar, Toolbar, Typography, Button, useTheme, useMediaQuery, Box } from '@mui/material';
+import React, { useState } from 'react';
+import {
+  AppBar, Toolbar, Typography, Button, Box,
+  useTheme, useMediaQuery, IconButton, Drawer, List, ListItem, ListItemButton, ListItemText
+} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 
 export default function Header({ setView, currentView }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const handleTabClick = (tab) => {
+    setView(tab);
+    setDrawerOpen(false);
+  };
+
+  const tabList = [
+    { label: 'FILL OUT SURVEY', value: 'form' },
+    { label: 'VIEW SURVEY RESULTS', value: 'results' }
+  ];
 
   return (
     <AppBar position="static" sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
       <Toolbar
         sx={{
           justifyContent: 'space-between',
-          flexDirection: isMobile ? 'column' : 'row',
-          alignItems: isMobile ? 'flex-start' : 'center',
+          flexDirection: isMobile ? 'row' : 'row',
+          alignItems: 'center',
           px: isMobile ? 1 : 2,
           py: isMobile ? 1 : 0,
         }}
@@ -19,69 +34,86 @@ export default function Header({ setView, currentView }) {
         <Typography
           variant={isMobile ? 'subtitle1' : 'h6'}
           sx={{
-            color: '#000',
+            color: 'black',
             fontWeight: 'bold',
-            mb: isMobile ? 1 : 0,
             fontSize: isMobile ? '1.1rem' : undefined,
           }}
         >
           _ Surveys
         </Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: isMobile ? 'column' : 'row',
-            gap: isMobile ? 1 : 0,
-            width: isMobile ? '100%' : 'auto',
-          }}
-        >
-          <Button
-            color="inherit"
-            fullWidth={isMobile}
-            onClick={() => setView('form')}
+        {isMobile ? (
+          <>
+            <IconButton
+              edge="end"
+              color="black"
+              aria-label="menu"
+              onClick={() => setDrawerOpen(true)}
+              sx={{ ml: 1 }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Drawer
+              anchor="right"
+              open={drawerOpen}
+              onClose={() => setDrawerOpen(false)}
+            >
+              <Box sx={{ width: 220 }}>
+                <List>
+                  {tabList.map(tab => (
+                    <ListItem key={tab.value} disablePadding>
+                      <ListItemButton
+                        selected={currentView === tab.value}
+                        onClick={() => handleTabClick(tab.value)}
+                        sx={{
+                          backgroundColor: currentView === tab.value ? '#87CEEB' : 'transparent',
+                          color: currentView === tab.value ? '#fff' : '#000',
+                          fontWeight: currentView === tab.value ? 'bold' : 'normal',
+                        }}
+                      >
+                        <ListItemText primary={tab.label} />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+            </Drawer>
+          </>
+        ) : (
+          <Box
             sx={{
-              color: currentView === 'form' ? '#fff' : '#000',
-              backgroundColor: currentView === 'form' ? '#87CEEB' : 'transparent',
-              borderRadius: isMobile ? 2 : '6px 6px 0 0',
-              margin: isMobile ? '0 0 4px 0' : '0 8px',
-              fontWeight: currentView === 'form' ? 'bold' : 'normal',
-              fontSize: isMobile ? '0.95rem' : '1rem',
-              boxShadow: currentView === 'form' ? '0 2px 8px rgba(135,206,235,0.15)' : 'none',
-              px: isMobile ? 1 : 2,
-              py: isMobile ? 1.2 : 1,
-              '&:hover': {
-                backgroundColor: '#87CEEB',
-                color: '#fff',
-              },
-              transition: 'all 0.2s',
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 0,
+              borderBottom: '1px solid #e0e0e0',
             }}
           >
-            FILL OUT SURVEY
-          </Button>
-          <Button
-            color="inherit"
-            fullWidth={isMobile}
-            onClick={() => setView('results')}
-            sx={{
-              color: currentView === 'results' ? '#fff' : '#000',
-              backgroundColor: currentView === 'results' ? '#87CEEB' : 'transparent',
-              borderRadius: isMobile ? 2 : '6px 6px 0 0',
-              margin: isMobile ? 0 : '0 8px',
-              fontWeight: currentView === 'results' ? 'bold' : 'normal',
-              fontSize: isMobile ? '0.95rem' : '1rem',
-              boxShadow: currentView === 'results' ? '0 2px 8px rgba(135,206,235,0.15)' : 'none',
-              px: isMobile ? 1 : 2,
-              py: isMobile ? 1.2 : 1,
-              '&:hover': {
-                backgroundColor: '#87CEEB',
-                color: '#fff',
-              },
-              transition: 'all 0.2s',
-            }}
-          >
-            VIEW SURVEY RESULTS
-          </Button>
-        </Box>
+            {tabList.map(tab => (
+              <Button
+                key={tab.value}
+                color="inherit"
+                onClick={() => setView(tab.value)}
+                sx={{
+                  color: currentView === tab.value ? '#fff' : '#000',
+                  backgroundColor: currentView === tab.value ? '#87CEEB' : 'transparent',
+                  borderRadius: '6px 6px 0 0',
+                  margin: '0 8px',
+                  fontWeight: currentView === tab.value ? 'bold' : 'normal',
+                  fontSize: '1rem',
+                  boxShadow: currentView === tab.value ? '0 2px 8px rgba(135,206,235,0.15)' : 'none',
+                  px: 2,
+                  py: 1,
+                  transition: 'all 0.2s',
+                  '&:hover': {
+                    backgroundColor: currentView === tab.value ? '#87CEEB' : '#e3f4fb',
+                    color: currentView === tab.value ? 'black' : '#000',
+                  }
+                }}
+              >
+                {tab.label}
+              </Button>
+            ))}
+          </Box>
+        )}
       </Toolbar>
     </AppBar>
   );
